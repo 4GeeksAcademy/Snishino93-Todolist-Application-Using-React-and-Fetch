@@ -1,79 +1,79 @@
 import React, { useState, useEffect } from "react";
 
-const TodoList = () => {
-  const [todo, setTodo] = useState([]); // estado para almacenar la lista de tareas
-  const [inputValue, setInputValue] = useState(""); // estado para almacenar el valor del input
+function MyTodoList() {
+  const [tasks, setTasks] = useState([]);
+  const [inputValue, setInputValue] = useState("");
 
-  // función para realizar solicitudes a la API
-  const fetchData = async (method, data) => {
-    const response = await fetch(
-      "https://assets.breatheco.de/apis/fake/todos/user/username",
-      {
-        method: method,
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const result = await response.json();
-    return result;
-  };
-
-  // efecto para obtener la lista de tareas de la API cuando el componente se monta por primera vez
-  useEffect(() => {
-    fetchData("GET").then((data) => setTodo(data));
-  }, []);
-
-  // función para agregar una nueva tarea a la lista
-  const addTodo = (event) => {
-    if (event.key === "Enter" && inputValue.trim() !== "") {
-      const newTodo = [...todo, { label: inputValue, done: false }];
-      setTodo(newTodo);
-      setInputValue("");
-      fetchData("PUT", newTodo); // actualiza la lista en la API
+  const addTask = (e) => {
+    e.preventDefault();
+    if (inputValue.trim() !== "") {
+      let newTask = { title: inputValue, completed: false };
+      setTasks([...tasks, newTask]);
     }
+    setInputValue("");
   };
 
-  // función para eliminar una tarea de la lista
-  const deleteTodo = (index) => {
-    const newTodo = todo.filter((_, i) => i !== index);
-    setTodo(newTodo);
-    fetchData("PUT", newTodo); // actualiza la lista en la API
+  const updateTasks = () => {
+    fetch('https://assets.breatheco.de/apis/fake/todos/user/snishino', {
+      method: "PUT",
+      body: JSON.stringify(tasks),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
-  // función para limpiar toda la lista
-  const clearList = () => {
-    setTodo([]);
-    fetchData("PUT", []); // actualiza la lista en la API
+  const handleClearAllTasks = () => {
+    const updatedTasks = [];
+    setTasks(updatedTasks);
   };
+
+  useEffect(() => {
+    updateTasks();
+  }, [tasks]);
+  
 
   return (
-    <div>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(event) => setInputValue(event.target.value)}
-        onKeyPress={addTodo}
-        placeholder="Añadir tarea"
-      />
-      <ul>
-        {todo.length === 0 ? (
-          <li>No hay tareas, añadir tareas</li>
-        ) : (
-          todo.map((todo, index) => (
-            <li key={index}>
-              {todo.label}
-              <span className="delete-btn" onClick={() => deleteTodo(index)}>
+    <div className="container py-4">
+      <div className="text-center" >
+        <form onSubmit={addTask}>
+          <div className="input-group mb-3">
+            <input
+              onChange={(e) => setInputValue(e.target.value)}
+              value={inputValue}
+              type="text"
+              className="form-control"
+              placeholder="Agregar nueva tarea"
+              style={{ borderRadius: "10px 0 0 10px" }}
+            />
+            <button className="btn btn-primary" type="submit">
+              Agregar
+            </button>
+          </div>
+        </form>
+        <ul className="list-group">
+          {tasks.map((task, index) => (
+            <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+              {task.title}
+              <button className="btn btn-danger" onClick={() => setTasks(tasks.filter((_, i) => index !== i))}>
                 x
-              </span>
+              </button>
             </li>
-          ))
-        )}
-      </ul>
-      <button onClick={clearList}>Limpiar lista completa</button>
+          ))}
+        </ul>
+        <p style={{ color: "#3f5efb", fontSize: "2.5rem" }}>{tasks.length === 0 ? "No hay tareas pendientes" : `Tienes ${tasks.length} tareas pendientes`}</p>
+        <button className="btn btn-danger mt-3" onClick={handleClearAllTasks}>
+          Borrar todas las tareas
+        </button>
+      </div>
     </div>
   );
-};
+}
 
-export default TodoList;
+export default MyTodoList;
