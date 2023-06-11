@@ -14,7 +14,7 @@ function MyTodoList() {
   };
 
   const updateTasks = () => {
-    fetch('https://assets.breatheco.de/apis/fake/todos/user/snishino', {
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/snishino", {
       method: "PUT",
       body: JSON.stringify(tasks),
       headers: {
@@ -23,6 +23,7 @@ function MyTodoList() {
     })
       .then((response) => response.json())
       .then((data) => {
+                // Aquí puede realizar acciones adicionales después de actualizar las tareas
       })
       .catch((error) => {
         console.log(error);
@@ -36,12 +37,12 @@ function MyTodoList() {
 
   useEffect(() => {
     updateTasks();
+        // Agrega `tasks` como una dependencia para que la actualización se realice cuando cambie
   }, [tasks]);
-  
 
   return (
     <div className="container py-4">
-      <div className="text-center" >
+      <div className="text-center">
         <form onSubmit={addTask}>
           <div className="input-group mb-3">
             <input
@@ -59,16 +60,31 @@ function MyTodoList() {
         </form>
         <ul className="list-group">
           {tasks.map((task, index) => (
-            <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+            <li
+              key={index}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
               {task.title}
-              <button className="btn btn-danger" onClick={() => setTasks(tasks.filter((_, i) => index !== i))}>
+              <button
+                className="btn btn-danger"
+                onClick={() =>
+                  setTasks(tasks.filter((_, i) => index !== i))
+                }
+              >
                 x
               </button>
             </li>
           ))}
         </ul>
-        <p style={{ color: "#3f5efb", fontSize: "2.5rem" }}>{tasks.length === 0 ? "No hay tareas pendientes" : `Tienes ${tasks.length} tareas pendientes`}</p>
-        <button className="btn btn-danger mt-3" onClick={handleClearAllTasks}>
+        <p className="text-primary" >
+          {tasks.length === 0
+            ? "No hay tareas pendientes"
+            : `Tienes ${tasks.length} tareas pendientes`}
+        </p>
+        <button
+          className="btn btn-danger mt-3"
+          onClick={handleClearAllTasks}
+        >
           Borrar todas las tareas
         </button>
       </div>
